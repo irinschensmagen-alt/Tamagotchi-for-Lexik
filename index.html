@@ -534,10 +534,12 @@ body{background:linear-gradient(135deg,var(--bg),#EEF4FF);color:var(--tx);}
   border-color:var(--ye);box-shadow:0 2px 8px rgba(212,120,0,.3);
   animation:cin .4s cubic-bezier(.34,1.56,.64,1);}
 
-/* ═══ LEVEL 2 ROOM ═══ */
-.room{position:relative;width:100%;max-width:760px;min-height:260px;
-  border-radius:var(--r);overflow:hidden;margin:8px 0;box-shadow:var(--sh);}
-.room-ov{position:absolute;inset:0;background:rgba(255,255,255,.1);z-index:2;}
+/* ═══ LEVEL 2 PLAY ARENA (no room background) ═══ */
+.l2-arena{position:relative;width:100%;max-width:760px;min-height:240px;
+  border-radius:var(--r);overflow:hidden;margin:8px 0;
+  background:linear-gradient(160deg,#F0EBFF,#E8F4FD);
+  box-shadow:var(--sh);border:2px solid var(--pu3);}
+.room-ov{display:none;}
 .wword{position:absolute;top:12px;left:50%;transform:translateX(-50%);
   background:rgba(255,255,255,.97);border:2px solid var(--pu);
   border-radius:12px;padding:8px 18px;z-index:6;text-align:center;
@@ -806,13 +808,6 @@ body{background:linear-gradient(135deg,var(--bg),#EEF4FF);color:var(--tx);}
   </div>
   <div class="cats" id="l1cats"></div>
   <div class="grow2">
-    <!-- ROOM PANEL — pure CSS, no external image needed -->
-    <div class="hpanel" id="l1hpanel">
-      <div class="room-css" id="l1room-css"></div>
-      <div class="room-decos-ov" id="l1room-decos"></div>
-      <div class="room-items-ov" id="l1room-items" style="z-index:4;bottom:26px;"></div>
-      <div class="rlbl" id="l1rlbl">🏠 Дом</div>
-    </div>
     <div class="bubble-wrap">
       <div class="sp-bub" id="l1bub">Привет!</div>
       <div class="action-frame af-sleep" id="l1frame"></div>
@@ -858,12 +853,7 @@ body{background:linear-gradient(135deg,var(--bg),#EEF4FF);color:var(--tx);}
     <span class="tmr-num-big" id="l2tmr-num">30с</span>
   </div>
   <div class="cats" id="l2cats"></div>
-  <div class="room" id="l2room">
-    <!-- CSS room background -->
-    <div class="room-css" id="l2room-css" style="z-index:1;"></div>
-    <div class="room-ov" style="z-index:2;"></div>
-    <div class="room-decos-ov" id="l2room-decos" style="z-index:3;"></div>
-    <div class="room-items-ov" id="l2room-items" style="z-index:4;bottom:40px;"></div>
+  <div class="l2-arena" id="l2room">
     <div class="wword"><div class="wwl">Подбери пару:</div><div class="wwt" id="l2sw">—</div></div>
     <div id="l2mice"></div>
     <div class="l2-tama-wrap" id="l2tama-wrap"></div>
@@ -1023,9 +1013,9 @@ function initAC(){if(AC)return;try{AC=new(window.AudioContext||window.webkitAudi
   bgG=AC.createGain();bgG.gain.value=.18;bgG.connect(AC.destination);}catch(e){}}
 function nt(f,t,d,v=.45,dst=null){if(!AC)return;
   const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(dst||AC.destination);
-  o.type='square';o.frequency.setValueAtTime(f,t);
-  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.015);
-  g.gain.exponentialRampToValueAtTime(.001,t+d-.01);o.start(t);o.stop(t+d);}
+  o.type='triangle';o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.02);
+  g.gain.exponentialRampToValueAtTime(.001,t+d-.02);o.start(t);o.stop(t+d);}
 function seq(mel,v=.4){if(!AC)return;if(AC.state==='suspended')AC.resume();
   let t=AC.currentTime+.04;mel.forEach(s=>{if(s){nt(s[0],t,s[1],v);t+=s[1];}});}
 function playBg(){if(!melOn||!AC)return;
@@ -1046,11 +1036,11 @@ function toggleMusic(){melOn?stopMusic():startMusic();}
 function updMW(){document.getElementById('mw-btn').textContent=melOn?'⏸ Пауза':'▶ Музыка';
   document.getElementById('mw-st').textContent=melOn?'♩ ♪ ♫':'— тихо —';}
 function sfx(id){try{const a=document.getElementById(id);a.currentTime=0;a.play().catch(()=>{});}catch(e){}}
-function playOK(){initAC();seq(OK_M,.5);sfx('aok');}
-function playErr(){initAC();seq(ERR_M,.4);}
-function playWin(){initAC();seq(WIN,.5);}
-function playFail(){initAC();seq(FAIL_M,.4);}
-document.addEventListener('click',()=>{if(!AC){initAC();}if(!melOn){startMusic();}},{once:true});
+function playOK(){initAC();seq(OK_M,.4);sfx('aok');}
+function playErr(){initAC();seq(ERR_M,.3);}
+function playWin(){initAC();seq(WIN,.4);}
+function playFail(){initAC();seq(FAIL_M,.3);}
+// Music starts only when player explicitly presses ▶ Музыка
 
 // ════════════════════════════════
 //  PETS
@@ -1123,37 +1113,37 @@ function makeActionFrame(pi,stage,theme){
 // ════════════════════════════════
 const WORD_EMOJI={
   // сон
-  'кровать':'🛏','диван':'🛋','ночь':'🌙','плед':'🧸','спать':'😴',
-  'выключить свет':'💡','подушка':'🛌','лежать':'🛏','устать':'😪','одеяло':'🛌',
+  'кровать':'🛏','диван':'🛋','ночь':'🌙','настольная лампа':'🪔','спать':'😴',
+  'выключить свет':'💡','подушка':'😴','лежать':'🛏','устать':'😪','одеяло':'🛌',
   // питание
   'рыба':'🐟','мясо':'🥩','молоко':'🥛','вода':'💧','сыр':'🧀','яйцо':'🥚',
   'корм':'🥣','булочка':'🥐','салат':'🥗','вкусняшка':'🍬',
   // игра
-  'прятки':'🙈','догонялки':'🏃','футбол':'⚽','мяч':'🏀','шахматы':'♟',
-  'шашки':'🎯','игрушка':'🎁','мышка':'🐭','теннис':'🎾','компьютерная игра':'🎮',
+  'прятки':'🙈','догонялки':'🏃','футбол':'⚽','мяч':'🏀','шахматы':'♟️',
+  'боулинг':'🎳','игрушка':'🎁','мышка':'🐭','теннис':'🎾','компьютерная игра':'🎮',
   // прогулка
   'в горах':'⛰️','в парке':'🌳','в лесу':'🌲','во дворе':'🏡','в центре города':'🏙️',
   'на лугу':'🌾','по берегу реки':'🏞️','в саду':'🌸','за городом':'🌅','в поле':'🌻',
   // одежда
   'красное':'👗','белые':'👟','модно':'✨','шляпку':'👒','на каблуках':'👠',
-  'вязаная':'🧣','перламутровая':'🔮','коралловые':'🪸','спортивный':'🩱','из хлопка':'🌿',
+  'вязаная':'🧣','перламутровая':'💎','коралловые':'🧡','спортивный':'👕','из хлопка':'🌿',
   // хобби
   'музыку':'🎵','мультфильм':'📺','домик':'🏠','книги':'📚','на велосипеде':'🚲',
-  'на скрипке':'🎻','монеты':'🪙','мастерски':'🎪','торты':'🎂','в хоре':'🎤',
+  'на скрипке':'🎻','монеты':'🪙','мастерски':'🏆','торты':'🎂','в хоре':'🎤',
   // болезнь
   'гриппом':'🤒','высокая':'🌡️','таблетки':'💊','с травами':'🌿','температуру':'🌡️',
-  'горло':'🩺','в нос':'👃','укол':'💉','к врачу':'👨‍⚕️','в постели':'🛏',
+  'горло':'🗣️','в нос':'👃','укол':'💉','к врачу':'👨‍⚕️','в постели':'🛏',
   // гигиена
-  'лоток':'🪣','в ванной':'🛁','лапы':'🐾','воду':'💧','корм':'🥣',
-  'душ':'🚿','чистая':'✨','гигиена':'🧼','шёрстку':'🪮','зубы':'🦷',
+  'лоток':'🧹','в ванной':'🛁','лапы':'🐾','воду':'💧','корм':'🥣',
+  'душ':'🚿','чистая':'✨','гигиена':'🧼','шерсть':'🐑','зубы':'🦷',
   // дружба
-  'Друг':'🤝','жаль':'💕','поведёшься':'🤝','честный':'👑','правдой':'⚖️',
+  'Друг':'🤝','жаль':'😔','поведёшься':'🤝','честный':'👑','правдой':'⚖️',
   // эмоции
-  'грех':'😅','Слезами':'😭','печаль':'😢','кошки':'🐱','Гнев':'😤',
+  'грех':'😬','Слезами':'😭','печаль':'😢','кошки':'🐱','Гнев':'😤',
   // знания
   'учись':'📚','свет':'💡','Повторенье':'🔄','уму':'🧠','ученьем':'🎓',
   // праздник
-  'гостей':'🎉','празднику':'🎊','Масленица':'🎭','час':'⏰','дом':'🏠',
+  'гостей':'🎉','празднику':'🎊','Масленица':'🥞','час':'⏰','дом':'🏠',
   // default
   'default':'🌟'
 };
@@ -1358,9 +1348,9 @@ function showReaction(ok,pi,theme,word){
 // ════════════════════════════════
 const L1C=['сон','питание','игра','прогулка'];
 const L1D={
-  'сон':     ['кровать','диван','ночь','плед','спать','выключить свет','подушка','лежать','устать','одеяло'],
+  'сон':     ['кровать','диван','ночь','настольная лампа','спать','выключить свет','подушка','лежать','устать','одеяло'],
   'питание': ['рыба','мясо','молоко','вода','сыр','яйцо','корм','булочка','салат','вкусняшка'],
-  'игра':    ['прятки','догонялки','футбол','мяч','шахматы','шашки','игрушка','мышка','теннис','компьютерная игра'],
+  'игра':    ['прятки','догонялки','футбол','мяч','шахматы','боулинг','игрушка','мышка','теннис','компьютерная игра'],
   'прогулка':['в горах','в парке','в лесу','во дворе','в центре города','на лугу','по берегу реки','в саду','за городом','в поле']};
 const L2C=['одежда','хобби','болезнь','гигиена'];
 const L2D={
@@ -1376,7 +1366,7 @@ const L2D={
     {s:'закапывать',e:'в нос'},{s:'сделать',e:'укол'},{s:'идти',e:'к врачу'},{s:'лежать',e:'в постели'}],
   'гигиена':[{s:'почистить',e:'лоток'},{s:'помыть',e:'лапы'},{s:'налить',e:'воду'},
     {s:'насыпать',e:'корм'},{s:'принять',e:'душ'},{s:'вода',e:'чистая'},
-    {s:'личная',e:'гигиена'},{s:'причесать',e:'шёрстку'},{s:'чистить',e:'зубы'},{s:'умыть',e:'мордочку'}]};
+    {s:'личная',e:'гигиена'},{s:'причесать',e:'шерсть'},{s:'чистить',e:'зубы'},{s:'умыть',e:'мордочку'}]};
 const L3C=['дружба','эмоции','знания','праздник'];
 const L3D=[
   {c:'дружба', p:'_____ познаётся в беде.',                    a:'Друг'},
@@ -1399,10 +1389,13 @@ const L3D=[
   {c:'эмоции', p:'На сердце _____ скребут.',                    a:'кошки'},
   {c:'знания', p:'По одежке встречают, по _____ провожают.',    a:'уму'},
   {c:'праздник',p:'Не всё коту _____, будет и Великий пост.',    a:'Масленица'}];
+const SVG_TOOTHBRUSH=`<svg viewBox="0 0 32 32" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><rect x="13" y="17" width="6" height="13" rx="3" fill="#29B6F6"/><rect x="7" y="2" width="18" height="17" rx="5" fill="#4FC3F7"/><rect x="9.5" y="4" width="3" height="9" rx="1.5" fill="white" opacity="0.9"/><rect x="14.5" y="4" width="3" height="9" rx="1.5" fill="white" opacity="0.9"/><rect x="19.5" y="4" width="3" height="9" rx="1.5" fill="white" opacity="0.9"/></svg>`;
+const SVG_COMB=`<svg viewBox="0 0 32 32" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="20" width="28" height="8" rx="4" fill="#FF7043"/><rect x="4" y="8" width="3.5" height="14" rx="1.75" fill="#FF7043"/><rect x="9" y="8" width="3.5" height="14" rx="1.75" fill="#FF7043"/><rect x="14" y="8" width="3.5" height="14" rx="1.75" fill="#FF7043"/><rect x="19" y="8" width="3.5" height="14" rx="1.75" fill="#FF7043"/><rect x="24" y="8" width="3.5" height="14" rx="1.75" fill="#FF7043"/></svg>`;
+
 const SHOP={
-  1:[{e:'⚽',n:'Мяч'},{e:'♟️',n:'Шахматы'},{e:'🎲',n:'Шашки'},{e:'🐭',n:'Мышка'},
+  1:[{e:'⚽',n:'Мяч'},{e:'♟️',n:'Шахматы'},{e:'🎳',n:'Боулинг'},{e:'🐭',n:'Мышка'},
      {e:'⛸️',n:'Коньки'},{e:'🎿',n:'Лыжи'},{e:'🛷',n:'Санки'},{e:'💡',n:'Лампа'},{e:'😴',n:'Пижама'},{e:'🥿',n:'Тапки'}],
-  2:[{e:'🧴',n:'Шампунь'},{e:'🪥',n:'Зубная щётка'},{e:'💊',n:'Таблетки'},{e:'🪮',n:'Расчёска'},
+  2:[{e:'🧴',n:'Шампунь'},{e:SVG_TOOTHBRUSH,n:'Зубная щётка',svg:true},{e:'💊',n:'Таблетки'},{e:SVG_COMB,n:'Расчёска',svg:true},
      {e:'🛁',n:'Полотенце'},{e:'👖',n:'Брюки'},{e:'🧥',n:'Куртка'},{e:'👗',n:'Платье'},{e:'👟',n:'Кроссовки'},{e:'🔖',n:'Брелок'}],
   3:[{e:'🍖',n:'Влажный корм'},{e:'🥣',n:'Сухой корм'},{e:'🥛',n:'Молоко'},{e:'💧',n:'Вода'},{e:'🥚',n:'Яйцо'}]};
 function firstTwo(w){return w.length>=2?w.substring(0,2)+'-':w+'-';}
@@ -1663,8 +1656,6 @@ function nextL1(){
   setFB('l1fb','Выбери правильное слово!','fi');
   const ai=rnd(4),ac=L1C[ai];
   mkCats('l1cats',L1C,ac);
-  // set room
-  setRoom('l1room-css','l1rlbl',ac);
   // set action frame
   const af=document.getElementById('l1frame');
   const rm=ROOM_MAP[ac]||ROOM_MAP['игра'];
@@ -1756,14 +1747,6 @@ function nextL2(){
   document.getElementById('l2ri').textContent=`Вопрос ${G.rn+1} из 10`;
   setFB('l2fb','Поймай правильную мышку!','fi');
   const ai=rnd(4),ac=L2C[ai];mkCats('l2cats',L2C,ac);
-  // set room background in l2
-  const rm2=ROOM_MAP[ac]||ROOM_MAP['одежда'];
-  const d=document.getElementById('l2room-css');
-  if(d){d.className=`room-css ${rm2.cls}`;d.innerHTML='';}
-  const ov2=document.getElementById('l2room-decos');
-  if(ov2){ov2.innerHTML=
-    `<span class="rdeco rdeco-top">${rm2.decoTop||''}</span>`+
-    `<span class="rdeco rdeco-bot" style="bottom:32px;">${rm2.decoBot||''}</span>`;}
   const cor=pick(L2D[ac],G.u2[ac]);
   document.getElementById('l2sw').textContent=cor.s;
   const ot=L2C.filter(c=>c!==ac);
@@ -1919,17 +1902,26 @@ function goShop(){const lv=G.slv;
     if(continueBtn){continueBtn.textContent='Продолжить ▶';continueBtn.className='btn bp';}
   }
   show('s-shop');}
+function itemIcon(it,size){
+  // Returns HTML string for the item icon (SVG or emoji)
+  if(it.svg)return `<span style="display:flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;">${it.e}</span>`;
+  return `<span style="font-size:${size}px;line-height:1;">${it.e}</span>`;}
+function itemText(it){return it.svg?'🧼':it.e;} // text fallback for bought-shelf
+
 function bldShop(lv){const g=document.getElementById('sh-g');g.innerHTML='';
   SHOP[lv].forEach((it,i)=>{const bt=G.bgt[lv].includes(i),po=G.coins<1;
     const d=document.createElement('div');d.className='si'+(bt?' done':po?' poor':'');
-    d.innerHTML=`<div class="sie">${it.e}</div><div class="sin">${it.n}</div><div class="sip">🪙 1</div>`;
+    d.innerHTML=`<div class="sie">${itemIcon(it,26)}</div><div class="sin">${it.n}</div><div class="sip">🪙 1</div>`;
     if(!bt&&!po)d.addEventListener('click',()=>{G.coins--;G.bgt[lv].push(i);
       document.getElementById('sh-c').textContent=`Монеток: ${G.coins} 🪙`;
       bldShop(lv);rndrBought(lv);});g.appendChild(d);});}
 function rndrBought(lv){const r=document.getElementById('sh-b');r.innerHTML='';
-  G.bgt[lv].forEach(i=>{const it=SHOP[lv][i];const s=document.createElement('span');
-    s.style.cssText='font-size:32px;animation:petFloat 2s ease-in-out infinite;display:inline-block;';
-    s.title=it.n;s.textContent=it.e;r.appendChild(s);});}
+  G.bgt[lv].forEach(i=>{const it=SHOP[lv][i];
+    const s=document.createElement('span');
+    s.style.cssText='font-size:32px;animation:petFloat 2s ease-in-out infinite;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;';
+    s.title=it.n;
+    if(it.svg){s.innerHTML=it.e;}else{s.textContent=it.e;}
+    r.appendChild(s);});}
 function afterShop(){const lv=G.slv;
   if(G.lastP<75){
     const why=G.lastP>=60
