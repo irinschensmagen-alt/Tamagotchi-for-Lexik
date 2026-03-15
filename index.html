@@ -1399,13 +1399,10 @@ const L3D=[
   {c:'эмоции', p:'На сердце _____ скребут.',                    a:'кошки'},
   {c:'знания', p:'По одежке встречают, по _____ провожают.',    a:'уму'},
   {c:'праздник',p:'Не всё коту _____, будет и Великий пост.',    a:'Масленица'}];
-const SVG_TOOTHBRUSH=`<svg viewBox="0 0 32 32" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><rect x="13" y="17" width="6" height="13" rx="3" fill="#29B6F6"/><rect x="7" y="2" width="18" height="17" rx="5" fill="#4FC3F7"/><rect x="9.5" y="4" width="3" height="9" rx="1.5" fill="white" opacity="0.9"/><rect x="14.5" y="4" width="3" height="9" rx="1.5" fill="white" opacity="0.9"/><rect x="19.5" y="4" width="3" height="9" rx="1.5" fill="white" opacity="0.9"/></svg>`;
-const SVG_COMB=`<svg viewBox="0 0 32 32" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="20" width="28" height="8" rx="4" fill="#FF7043"/><rect x="4" y="8" width="3.5" height="14" rx="1.75" fill="#FF7043"/><rect x="9" y="8" width="3.5" height="14" rx="1.75" fill="#FF7043"/><rect x="14" y="8" width="3.5" height="14" rx="1.75" fill="#FF7043"/><rect x="19" y="8" width="3.5" height="14" rx="1.75" fill="#FF7043"/><rect x="24" y="8" width="3.5" height="14" rx="1.75" fill="#FF7043"/></svg>`;
-
 const SHOP={
   1:[{e:'⚽',n:'Мяч'},{e:'♟️',n:'Шахматы'},{e:'🎲',n:'Шашки'},{e:'🐭',n:'Мышка'},
      {e:'⛸️',n:'Коньки'},{e:'🎿',n:'Лыжи'},{e:'🛷',n:'Санки'},{e:'💡',n:'Лампа'},{e:'😴',n:'Пижама'},{e:'🥿',n:'Тапки'}],
-  2:[{e:'🧴',n:'Шампунь'},{e:SVG_TOOTHBRUSH,n:'Зубная щётка',svg:true},{e:'💊',n:'Таблетки'},{e:SVG_COMB,n:'Расчёска',svg:true},
+  2:[{e:'🧴',n:'Шампунь'},{e:'🪥',n:'Зубная щётка'},{e:'💊',n:'Таблетки'},{e:'🪮',n:'Расчёска'},
      {e:'🛁',n:'Полотенце'},{e:'👖',n:'Брюки'},{e:'🧥',n:'Куртка'},{e:'👗',n:'Платье'},{e:'👟',n:'Кроссовки'},{e:'🔖',n:'Брелок'}],
   3:[{e:'🍖',n:'Влажный корм'},{e:'🥣',n:'Сухой корм'},{e:'🥛',n:'Молоко'},{e:'💧',n:'Вода'},{e:'🥚',n:'Яйцо'}]};
 function firstTwo(w){return w.length>=2?w.substring(0,2)+'-':w+'-';}
@@ -1922,26 +1919,17 @@ function goShop(){const lv=G.slv;
     if(continueBtn){continueBtn.textContent='Продолжить ▶';continueBtn.className='btn bp';}
   }
   show('s-shop');}
-function itemIcon(it,size){
-  // Returns HTML string for the item icon (SVG or emoji)
-  if(it.svg)return `<span style="display:flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;">${it.e}</span>`;
-  return `<span style="font-size:${size}px;line-height:1;">${it.e}</span>`;}
-function itemText(it){return it.svg?'🧼':it.e;} // text fallback for bought-shelf
-
 function bldShop(lv){const g=document.getElementById('sh-g');g.innerHTML='';
   SHOP[lv].forEach((it,i)=>{const bt=G.bgt[lv].includes(i),po=G.coins<1;
     const d=document.createElement('div');d.className='si'+(bt?' done':po?' poor':'');
-    d.innerHTML=`<div class="sie">${itemIcon(it,26)}</div><div class="sin">${it.n}</div><div class="sip">🪙 1</div>`;
+    d.innerHTML=`<div class="sie">${it.e}</div><div class="sin">${it.n}</div><div class="sip">🪙 1</div>`;
     if(!bt&&!po)d.addEventListener('click',()=>{G.coins--;G.bgt[lv].push(i);
       document.getElementById('sh-c').textContent=`Монеток: ${G.coins} 🪙`;
       bldShop(lv);rndrBought(lv);});g.appendChild(d);});}
 function rndrBought(lv){const r=document.getElementById('sh-b');r.innerHTML='';
-  G.bgt[lv].forEach(i=>{const it=SHOP[lv][i];
-    const s=document.createElement('span');
-    s.style.cssText='font-size:32px;animation:petFloat 2s ease-in-out infinite;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;';
-    s.title=it.n;
-    if(it.svg){s.innerHTML=it.e;}else{s.textContent=it.e;}
-    r.appendChild(s);});}
+  G.bgt[lv].forEach(i=>{const it=SHOP[lv][i];const s=document.createElement('span');
+    s.style.cssText='font-size:32px;animation:petFloat 2s ease-in-out infinite;display:inline-block;';
+    s.title=it.n;s.textContent=it.e;r.appendChild(s);});}
 function afterShop(){const lv=G.slv;
   if(G.lastP<75){
     const why=G.lastP>=60
